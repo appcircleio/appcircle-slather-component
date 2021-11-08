@@ -35,6 +35,7 @@ inputs:
   description: Extra options for Slather.
 outputs:
 - key: "AC_SLATHER_OUTPUT_PATH"
+  title: Output Path
   description: The directory where your Cobertura XML report will be written to.
   helpText:
 processFilename: ruby
