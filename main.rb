@@ -1,10 +1,10 @@
 require 'open3'
 require 'pathname'
 
-require 'dotenv'
+# require 'dotenv'
 
 # Debug
-Dotenv.load
+#Dotenv.load
 
 def get_env_variable(key)
 	return (ENV[key] == nil || ENV[key] == "") ? nil : ENV[key]
@@ -36,7 +36,7 @@ project_path = get_env_variable("AC_PROJECT_PATH") || abort('Missing .xcodeproj 
 workspace_path = get_env_variable("AC_WORKSPACE_PATH") || ""
 coverage_format = get_env_variable("AC_COVERAGE_FORMAT") || "cobertura"
 extra_options = get_env_variable("AC_SLATHER_OPTIONS") || ""
-config_option = et_env_variable("AC_CONFIGURATION_NAME") || ""
+config_option = get_env_variable("AC_CONFIGURATION_NAME") || ""
 temporary_path = get_env_variable("AC_TEMP_DIR") || abort('Missing temporary path.')
 
 # --simple-output, -s                      Output coverage results to the terminal
@@ -62,8 +62,8 @@ if !available_formats.has_key?(coverage_format)
 end
 
 # Install slather on macOS
-#runCommand("sudo gem install slather")
-#runCommand("slather version")
+runCommand("sudo gem install slather")
+runCommand("slather version")
 
 format_commandline = available_formats[coverage_format]
 commandline = "slather coverage #{format_commandline} --scheme #{scheme}"
@@ -73,8 +73,7 @@ end
 
 out_path = (Pathname.new temporary_path).join("slather_out")
 commandline += " #{project_path} #{extra_options} --output-directory #{out_path}"
-puts commandline
-#runCommand(commandline)
+runCommand(commandline)
 
 puts "AC_SLATHER_OUTPUT_PATH : #{out_path}"
 
