@@ -38,6 +38,7 @@ coverage_format = get_env_variable("AC_COVERAGE_FORMAT") || "cobertura"
 extra_options = get_env_variable("AC_SLATHER_OPTIONS") || ""
 config_option = get_env_variable("AC_CONFIGURATION_NAME") || ""
 temporary_path = get_env_variable("AC_TEMP_DIR") || abort('Missing temporary path.')
+out_path = get_env_variable("AC_SLATHER_OUTPUT_PATH") || (Pathname.new temporary_path).join("slather_out")
 
 # --simple-output, -s                      Output coverage results to the terminal
 # --gutter-json, -g                        Output coverage results as Gutter JSON format
@@ -66,13 +67,17 @@ runCommand("sudo gem install slather")
 runCommand("slather version")
 
 format_commandline = available_formats[coverage_format]
-commandline = "slather coverage #{format_commandline} --scheme #{scheme}"
+
+commandline = "slather coverage #{format_commandline} --scheme #{scheme} --output-directory #{out_path}"
 if workspace_path
     commandline += " --workspace #{workspace_path}"
 end
 
-out_path = (Pathname.new temporary_path).join("slather_out")
-commandline += " #{project_path} #{extra_options} --output-directory #{out_path}"
+if extra_options
+    commandline += " #{extra_options}"
+end
+
+commandline += " #{project_path}"
 runCommand(commandline)
 
 puts "AC_SLATHER_OUTPUT_PATH : #{out_path}"
