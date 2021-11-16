@@ -62,11 +62,6 @@ if !available_formats.has_key?(coverage_format)
     raise "Unknown coverage format!"
 end
 
-# Install slather on macOS
-runCommand("echo 'source ~/.rvm/scripts/rvm && rvm use 2.7.3 && gem install slather' > slatherinstall")
-runCommand("bash slatherinstall")
-runCommand("slather version")
-
 format_commandline = available_formats[coverage_format]
 
 commandline = "slather coverage #{format_commandline} --scheme #{scheme} --output-directory #{out_path}"
@@ -79,7 +74,11 @@ if extra_options
 end
 
 commandline += " #{project_path}"
-runCommand(commandline)
+# Install slather on macOS
+runCommand("echo 'source ~/.rvm/scripts/rvm && rvm use 2.7.3 && gem install slather && #{commandline}' > slatherinstall")
+runCommand("bash slatherinstall")
+
+# runCommand(commandline)
 
 puts "AC_SLATHER_OUTPUT_PATH : #{out_path}"
 
