@@ -13,8 +13,8 @@ inputs:
   isRequired: true
   title: Project Path
   description: "Specifies the project path. For example : ./appcircle.xcodeproj"
-- key: "AC_WORSPACE_PATH"
-  defaultValue: "$AC_WORSPACE_PATH"
+- key: "AC_WORKSPACE_PATH"
+  defaultValue: "$AC_WORKSPACE_PATH"
   isRequired: false
   title: Workspace Path
   description: "Specifies the project path. For example : ./appcircle.xcworkspace"
