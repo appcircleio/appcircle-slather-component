@@ -63,9 +63,8 @@ if !available_formats.has_key?(coverage_format)
 end
 
 # Install slather on macOS
-runCommand("source ~/.rvm/scripts/rvm")
-runCommand("rvm use 2.7.3")
-runCommand("gem install slather")
+runCommand("echo 'source ~/.rvm/scripts/rvm && rvm use 2.7.3 && gem install slather' > slatherinstall")
+runCommand("bash slatherinstall")
 runCommand("slather version")
 
 format_commandline = available_formats[coverage_format]
