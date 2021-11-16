@@ -63,7 +63,9 @@ if !available_formats.has_key?(coverage_format)
 end
 
 # Install slather on macOS
-runCommand("sudo gem install slather")
+runCommand("source ~/.rvm/scripts/rvm")
+runCommand("rvm use 2.7.3")
+runCommand("gem install slather")
 runCommand("slather version")
 
 format_commandline = available_formats[coverage_format]
@@ -86,4 +88,7 @@ puts "AC_SLATHER_OUTPUT_PATH : #{out_path}"
 open(ENV['AC_ENV_FILE_PATH'], 'a') { |f|
     f.puts "AC_SLATHER_OUTPUT_PATH=#{out_path}"
 }
+
+#revert to system ruby version
+runCommand("rvm use system")
 exit 0
