@@ -2,6 +2,16 @@ platform: iOS
 buildPlatform:
 displayName: Slather
 inputs:
+- key: "AC_REPOSITORY_DIR"
+  defaultValue: "$AC_REPOSITORY_DIR"
+  isRequired: true
+  title: Repository Directory
+  description: Specifies the cloned repository directory.
+- key: "AC_TEST_RESULT_PATH"
+  defaultValue: "$AC_TEST_RESULT_PATH"
+  isRequired: true
+  title: Test Result Path
+  description: Specifies .xcresult folder location
 - key: "AC_SCHEME"
   defaultValue: "$AC_SCHEME"
   isRequired: true

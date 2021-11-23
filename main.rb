@@ -1,26 +1,22 @@
 require 'open3'
 require 'pathname'
 
-# require 'dotenv'
-
-# Debug
-#Dotenv.load
-
 def get_env_variable(key)
 	return (ENV[key] == nil || ENV[key] == "") ? nil : ENV[key]
 end
 
-def runCommand(command)
+def runCommand(command, isLogReturn = false)
     puts "@@[command] #{command}"
     status = nil
-    stdout_str = nil
     stderr_str = nil
-
+    stdout_all_lines = ""
     Open3.popen3(command) do |stdin, stdout, stderr, wait_thr|
         stdout.each_line do |line|
+            if isLogReturn
+                stdout_all_lines += line
+            end
             puts line
         end
-        stdout_str = stdout.read
         stderr_str = stderr.read
         status = wait_thr.value
     end
@@ -29,16 +25,23 @@ def runCommand(command)
         puts stderr_str
         raise stderr_str
     end
+    return stdout_all_lines
 end
 
 scheme = get_env_variable("AC_SCHEME") || abort('Missing scheme')
+repository_path = get_env_variable("AC_REPOSITORY_DIR")
 project_path = get_env_variable("AC_PROJECT_PATH") || abort('Missing .xcodeproj path.')
 workspace_path = get_env_variable("AC_WORKSPACE_PATH") || ""
 coverage_format = get_env_variable("AC_COVERAGE_FORMAT") || "cobertura"
-extra_options = get_env_variable("AC_SLATHER_OPTIONS") || ""
-config_option = get_env_variable("AC_CONFIGURATION_NAME") || ""
-temporary_path = get_env_variable("AC_TEMP_DIR") || abort('Missing temporary path.')
-out_path = get_env_variable("AC_SLATHER_OUTPUT_PATH") || (Pathname.new temporary_path).join("slather_out")
+extra_options = get_env_variable("AC_SLATHER_OPTIONS")
+config_option = get_env_variable("AC_CONFIGURATION_NAME")
+ac_output_path = get_env_variable("AC_OUTPUT_DIR") || abort('Missing output path.')
+test_result_path = get_env_variable("AC_TEST_RESULT_PATH") || abort('Missing test result path.')
+if test_result_path.include?("/test.xcresult")
+    test_result_path = test_result_path.gsub("/test.xcresult", "")
+end
+slather_output_path = get_env_variable("AC_SLATHER_OUTPUT_PATH") || (Pathname.new ac_output_path).join("slather_output")
+xcodeproj_path = repository_path ?  (Pathname.new repository_path).join(project_path) : project_path
 
 # --simple-output, -s                      Output coverage results to the terminal
 # --gutter-json, -g                        Output coverage results as Gutter JSON format
@@ -64,29 +67,34 @@ end
 
 format_commandline = available_formats[coverage_format]
 
-commandline = "slather coverage #{format_commandline} --scheme #{scheme} --output-directory #{out_path}"
+commandline = "slather coverage #{format_commandline} --scheme #{scheme} --output-directory #{slather_output_path} -b #{test_result_path}"
 if workspace_path
-    commandline += " --workspace #{workspace_path}"
+    xcodeworkspace_path = repository_path ? (Pathname.new repository_path).join(workspace_path) : workspace_path
+    commandline += " --workspace #{xcodeworkspace_path}"
 end
 
+if config_option
+    commandline += " --configuration #{config_option}"
+end
 if extra_options
     commandline += " #{extra_options}"
 end
 
-commandline += " #{project_path}"
+commandline += " #{xcodeproj_path}"
 # Install slather on macOS
-runCommand("echo 'source ~/.rvm/scripts/rvm && rvm use 2.7.3 && gem install slather && #{commandline}' > slatherinstall")
-runCommand("bash slatherinstall")
+xcode_developer_dir_path = runCommand('xcode-select -p',true).strip
+runCommand("sudo xcode-select -r")
+runCommand("sudo gem install slather --no-document")
+# Setting back the xcode version.
+runCommand("sudo xcode-select --switch \"#{xcode_developer_dir_path}\"")
 
-# runCommand(commandline)
+runCommand(commandline)
 
-puts "AC_SLATHER_OUTPUT_PATH : #{out_path}"
+puts "AC_SLATHER_OUTPUT_PATH : #{slather_output_path}"
 
 #Write Environment Variable
 open(ENV['AC_ENV_FILE_PATH'], 'a') { |f|
-    f.puts "AC_SLATHER_OUTPUT_PATH=#{out_path}"
+    f.puts "AC_SLATHER_OUTPUT_PATH=#{slather_output_path}"
 }
 
-#revert to system ruby version
-runCommand("rvm use system")
 exit 0
