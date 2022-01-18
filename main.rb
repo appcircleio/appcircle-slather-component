@@ -84,6 +84,7 @@ commandline += " #{xcodeproj_path}"
 # Install slather on macOS
 xcode_developer_dir_path = runCommand('xcode-select -p',true).strip
 runCommand("sudo xcode-select -r")
+runCommand("sudo gem install nokogiri --no-document")
 runCommand("sudo gem install slather --no-document")
 # Setting back the xcode version.
 runCommand("sudo xcode-select --switch \"#{xcode_developer_dir_path}\"")
