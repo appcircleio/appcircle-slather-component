@@ -81,12 +81,14 @@ if extra_options
 end
 
 commandline += " #{xcodeproj_path}"
-# Install slather on macOS
-xcode_developer_dir_path = runCommand('xcode-select -p',true).strip
-runCommand("sudo xcode-select -r")
-runCommand("sudo gem install slather --no-document --platform x86_64-darwin")
-# Setting back the xcode version.
-runCommand("sudo xcode-select --switch \"#{xcode_developer_dir_path}\"")
+if `which slather`.empty?
+    # Install slather on macOS
+    xcode_developer_dir_path = runCommand('xcode-select -p',true).strip
+    runCommand("sudo xcode-select -r")
+    runCommand("sudo gem install slather --no-document --platform x86_64-darwin")
+    # Setting back the xcode version.
+    runCommand("sudo xcode-select --switch \"#{xcode_developer_dir_path}\"")
+end
 
 runCommand(commandline)
 
