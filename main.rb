@@ -28,6 +28,8 @@ def runCommand(command, isLogReturn = false)
     return stdout_all_lines
 end
 
+if __FILE__ == $PROGRAM_NAME
+
 scheme = get_env_variable("AC_SCHEME") || abort('Missing scheme')
 repository_path = get_env_variable("AC_REPOSITORY_DIR")
 project_path = get_env_variable("AC_PROJECT_PATH") || abort('Missing .xcodeproj path.')
@@ -100,3 +102,5 @@ open(ENV['AC_ENV_FILE_PATH'], 'a') { |f|
 }
 
 exit 0
+
+end # if __FILE__ == $PROGRAM_NAME

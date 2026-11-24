@@ -14,3 +14,13 @@ Optional Input Variables
 
 Output Variable
 - `$AC_SLATHER_OUTPUT_PATH`: Report output file path.
+
+## Running tests
+
+Requires [RSpec](https://rspec.info) gem and Ruby standard library (Coverage). No Gemfile or Bundler needed.
+
+```bash
+ruby test/test_main.rb
+```
+
+A coverage report is printed at the end of each run.
